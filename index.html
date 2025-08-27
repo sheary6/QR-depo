@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>MBPJ License QR Code Generator</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <style>
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background-color: #f9f9f9;
+      color: #333;
+      margin: 0;
+      padding: 20px;
+    }
+    .container {
+      max-width: 700px;
+      margin: 0 auto;
+      background: white;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    h1 {
+      text-align: center;
+      color: #0055a5;
+      margin-bottom: 20px;
+    }
+    .form-group {
+      margin-bottom: 15px;
+    }
+    label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 5px;
+      color: #0055a5;
+    }
+    input[type="text"], textarea {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+    textarea {
+      height: 80px;
+      resize: vertical;
+    }
+    button {
+      background-color: #0055a5;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+      margin-top: 10px;
+    }
+    button:hover {
+      background-color: #003d7a;
+    }
+    .preview {
+      margin-top: 20px;
+      padding: 15px;
+      background-color: #f8f9fa;
+      border: 1px dashed #ccc;
+      border-radius: 4px;
+    }
+    .qr-container {
+      display: flex;
+      justify-content: center;
+      margin: 30px 0;
+    }
+    .qr-code {
+      width: 200px;
+      height: 200px;
+      background: white;
+      border: 1px solid #000;
+      padding: 5px;
+      box-sizing: border-box;
+    }
+    .footer {
+      text-align: center;
+      font-size: 10px;
+      color: #777;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>MBPJ LICENSE QR CODE GENERATOR</h1>
+
+    <form id="licenseForm">
+      <div class="form-group">
+        <label for="accountNo">License Account No.</label>
+        <input type="text" id="accountNo" placeholder="e.g., L2540000675570" required>
+      </div>
+
+      <div class="form-group">
+        <label for="appNo">Application No.</label>
+        <input type="text" id="appNo" placeholder="e.g., EL2540000687612" required>
+      </div>
+
+      <div class="form-group">
+        <label for="businessName">Business Name</label>
+        <input type="text" id="businessName" placeholder="e.g., KOPI KENANGAN SDN BHD" required>
+      </div>
+
+      <div class="form-group">
+        <label for="address">Premises Address</label>
+        <textarea id="address" placeholder="e.g., UNIT 1302, LEVEL 13, UPTOWN 2, NO. 2 JALAN SS21/37, DAMANSARA UPTOWN, 47400 PETALING JAYA" required></textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="startDate">Start Date</label>
+        <input type="text" id="startDate" placeholder="e.g., 01 January, 2025" required>
+      </div>
+
+      <div class="form-group">
+        <label for="endDate">End Date</label>
+        <input type="text" id="endDate" placeholder="e.g., 31 December, 2025" required>
+      </div>
+
+      <div class="form-group">
+        <label for="status">Status</label>
+        <input type="text" id="status" placeholder="e.g., APPROVED" required>
+      </div>
+
+      <button type="button" onclick="generateQR()">Generate QR Code</button>
+    </form>
+
+    <div class="preview" id="preview">
+      <p><strong>Preview:</strong> Your QR code will appear here after clicking "Generate QR Code".</p>
+    </div>
+
+    <div class="qr-container">
+      <div id="qrcode" class="qr-code"></div>
+    </div>
+
+    <div class="footer">
+      Generated for official use • MBPJ Compliance • Scan to verify license details
+    </div>
+  </div>
+
+  <script>
+    window.onload = function () {
+      // Pre-fill sample data
+      document.getElementById('accountNo').value = 'L2540000675570';
+      document.getElementById('appNo').value = 'EL2540000687612';
+      document.getElementById('businessName').value = 'KOPI KENANGAN SDN BHD';
+      document.getElementById('address').value = 'UNIT 1302, LEVEL 13, UPTOWN 2, NO. 2 JALAN SS21/37, DAMANSARA UPTOWN, 47400 PETALING JAYA';
+      document.getElementById('startDate').value = '01 January, 2025';
+      document.getElementById('endDate').value = '31 December, 2025';
+      document.getElementById('status').value = 'APPROVED';
+    };
+
+    function generateQR() {
+      const accountNo = document.getElementById('accountNo').value.trim();
+      const appNo = document.getElementById('appNo').value.trim();
+      const businessName = document.getElementById('businessName').value.trim();
+      const address = document.getElementById('address').value.trim();
+      const startDate = document.getElementById('startDate').value.trim();
+      const endDate = document.getElementById('endDate').value.trim();
+      const status = document.getElementById('status').value.trim();
+
+      if (!accountNo || !appNo || !businessName || !address || !startDate || !endDate || !status) {
+        alert("Please fill in all fields.");
+        return;
+      }
+
+      const data = `
+License Account No.: ${accountNo}
+Application No.: ${appNo}
+Business Name: ${businessName}
+Premises Address: ${address}
+Start Date: ${startDate}
+End Date: ${endDate}
+Status: ${status}
+`.trim();
+
+      document.getElementById('preview').innerHTML = `<p><strong>QR Code Data:</strong><br>${data}</p>`;
+
+      const qrContainer = document.getElementById("qrcode");
+      qrContainer.innerHTML = "";
+
+      try {
+        new QRCode(qrContainer, {
+          text: data,
+          width: 200,
+          height: 200,
+          colorDark: "#000000",
+          colorLight: "#ffffff",
+          correctLevel: QRCode.CorrectLevel.H
+        });
+      } catch (error) {
+        console.error("QR Code generation failed:", error);
+        qrContainer.innerHTML = "<p style='color:red;'>Failed to generate QR code. Check internet connection.</p>";
+      }
+    }
+  </script>
+
+</body>
+</html>
