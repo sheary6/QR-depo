@@ -2,228 +2,214 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>License QR Generator</title>
+  <title>QR Designer</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f6f7f9;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      margin: 0;
-    }
-    .container {
-      background: #fff;
-      padding: 20px 30px;
-      border-radius: 12px;
-      box-shadow: 0 6px 20px rgba(0,0,0,0.1);
-      width: 520px;
-      max-width: 95vw;
-    }
-    h2 {
-      margin-top: 0;
-      font-size: 20px;
-      text-align: center;
-    }
-    label {
-      font-weight: bold;
-      display: block;
-      margin-top: 12px;
-    }
-    input, textarea {
-      width: 100%;
-      padding: 8px;
-      margin-top: 5px;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      font-size: 14px;
-    }
-    textarea { resize: vertical; min-height: 60px; }
-    button {
-      margin-top: 16px;
-      width: 100%;
-      padding: 10px;
-      font-size: 16px;
-      border: none;
-      border-radius: 8px;
-      background: #111827;
-      color: #fff;
-      cursor: pointer;
-      transition: background 0.2s;
-    }
-    button:hover { background: #374151; }
-    .qr-output { margin-top: 20px; }
-    .qr-block { margin-top: 18px; text-align: center; }
-    .qr-block h3 { margin-bottom: 8px; }
-    .qr-block img {
-      margin-top: 6px;
-      width: 220px;
-      height: 220px;
-      image-rendering: pixelated;
-    }
+    body { margin: 0; font-family: Arial, sans-serif; background: #f4f6f8; }
+    .wrap { display: grid; grid-template-columns: 420px 1fr; gap: 18px; padding: 18px; }
+    .panel { background: #fff; border-radius: 10px; box-shadow: 0 6px 20px rgba(0,0,0,0.08); }
+    .sidebar { padding: 0; }
+    .accordion { border-bottom: 1px solid #e5e7eb; }
+    .ac-head { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; cursor: pointer; font-weight: bold; }
+    .ac-body { padding: 12px 16px; display: none; }
+    .ac-body.open { display: block; }
+    .ac-head span { color: #6b7280; }
+    label { display: block; font-weight: bold; margin-top: 12px; }
+    input[type="text"], textarea, select { width: 100%; padding: 8px; margin-top: 6px; border: 1px solid #d1d5db; border-radius: 8px; }
+    textarea { min-height: 64px; resize: vertical; }
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .color-row { display: grid; grid-template-columns: 1fr auto; gap: 8px; align-items: center; }
+    .color-row input[type="color"] { width: 44px; height: 36px; padding: 0; border: none; background: transparent; }
+    .btn { display: inline-block; padding: 10px 12px; border-radius: 8px; border: none; background: #111827; color: #fff; cursor: pointer; width: 100%; margin-top: 12px; }
+    .btn.secondary { background: #374151; }
+    .preview { padding: 16px; display: grid; grid-template-rows: auto 1fr auto; align-items: start; justify-items: center; }
+    .preview .canvas { width: 360px; height: 360px; background: #fff; display: grid; place-items: center; border: 1px dashed #e5e7eb; }
+    .tools { width: 100%; margin-top: 12px; display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: center; }
+    .range { width: 100%; }
+    .dl-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; margin-top: 10px; }
+    .hint { color: #6b7280; font-size: 12px; }
+    .shape-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-top: 10px; }
+    .shape-grid button { border: 1px solid #d1d5db; border-radius: 8px; background: #fff; padding: 8px; cursor: pointer; }
   </style>
+  <script src="https://cdn.jsdelivr.net/npm/qr-code-styling@1.6.0/lib/qr-code-styling.js"></script>
 </head>
 <body>
-  <div class="container">
-    <h2>License QR Code Generator</h2>
-    <form id="qrForm">
-      <label>License Account No.:</label>
-      <input type="text" id="accountNo" value="L2540000675570">
-
-      <label>Application No.:</label>
-      <input type="text" id="applicationNo" value="EL2540000687612">
-
-      <label>Business Name:</label>
-      <input type="text" id="businessName" value="KOPI KENANGAN SDN BHD">
-
-      <label>Premises Address:</label>
-      <textarea id="address">UNIT 1302, LEVEL 13, UPTOWN 2,
-NO. 2 JALAN SS21/37,
-DAMANSARA UPTOWN,
-47400 PETALING JAYA</textarea>
-
-      <label>Start Date:</label>
-      <input type="text" id="startDate" value="01 January, 2025">
-
-      <label>End Date:</label>
-      <input type="text" id="endDate" value="31 December, 2025">
-
-      <label>Status:</label>
-      <input type="text" id="status" value="APPROVED">
-
-      <button type="button" onclick="generateQR()">Generate QR Codes</button>
-    </form>
-
-    <div class="qr-output">
-      <div class="qr-block">
-        <h3>📄 Full Info QR (Dense)</h3>
-        <div id="fullInfoQR"></div>
+  <div class="wrap">
+    <div class="panel sidebar">
+      <div class="accordion">
+        <div class="ac-head" data-target="#enter">ENTER CONTENT <span>+</span></div>
+        <div class="ac-body open" id="enter">
+          <label>License Account No.</label>
+          <input type="text" id="accountNo" value="L2540000675570">
+          <label>Application No.</label>
+          <input type="text" id="applicationNo" value="EL2540000687612">
+          <label>Business Name</label>
+          <input type="text" id="businessName" value="KOPI KENANGAN SDN BHD">
+          <label>Premises Address</label>
+          <textarea id="address">UNIT 1302, LEVEL 13, UPTOWN 2, NO. 2 JALAN SS21/37, DAMANSARA UPTOWN, 47400 PETALING JAYA</textarea>
+          <div class="row">
+            <div>
+              <label>Start Date</label>
+              <input type="text" id="startDate" value="01 January, 2025">
+            </div>
+            <div>
+              <label>End Date</label>
+              <input type="text" id="endDate" value="31 December, 2025">
+            </div>
+          </div>
+          <label>Status</label>
+          <input type="text" id="status" value="APPROVED">
+          <button class="btn" id="generateBtn">Create QR Code</button>
+        </div>
       </div>
-      <div class="qr-block">
-        <h3>🔗 Short Link QR (Clean)</h3>
-        <div id="shortLinkQR"></div>
-        <button type="button" id="downloadShortBtn" disabled>Download Short Link QR (PNG)</button>
+      <div class="accordion">
+        <div class="ac-head" data-target="#colors">SET COLORS <span>+</span></div>
+        <div class="ac-body" id="colors">
+          <div class="color-row">
+            <div>
+              <label>Foreground</label>
+              <input type="text" id="fgHex" value="#000000">
+            </div>
+            <input type="color" id="fgPicker" value="#000000">
+          </div>
+          <div class="color-row">
+            <div>
+              <label>Background</label>
+              <input type="text" id="bgHex" value="#ffffff">
+            </div>
+            <input type="color" id="bgPicker" value="#ffffff">
+          </div>
+        </div>
+      </div>
+      <div class="accordion">
+        <div class="ac-head" data-target="#logo">ADD LOGO IMAGE <span>+</span></div>
+        <div class="ac-body" id="logo">
+          <input type="file" id="logoFile" accept="image/*">
+          <div class="hint">PNG with transparent background recommended.</div>
+        </div>
+      </div>
+      <div class="accordion">
+        <div class="ac-head" data-target="#design">CUSTOMIZE DESIGN <span>+</span></div>
+        <div class="ac-body" id="design">
+          <label>Body Shape</label>
+          <div class="shape-grid">
+            <button data-dots="square">Square</button>
+            <button data-dots="dots">Dots</button>
+            <button data-dots="rounded">Rounded</button>
+            <button data-dots="classy">Classy</button>
+            <button data-dots="classy-rounded">Classy Rounded</button>
+          </div>
+          <label style="margin-top:12px;">Finder Corners</label>
+          <div class="shape-grid">
+            <button data-corners-square="square">Square</button>
+            <button data-corners-square="dot">Dot</button>
+            <button data-corners-square="extra-rounded">Extra Rounded</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel preview">
+      <div class="tools">
+        <div>
+          <input class="range" id="sizeRange" type="range" min="300" max="1400" step="10" value="600">
+        </div>
+        <div class="hint"><span id="sizeLabel">600</span> x <span id="sizeLabelY">600</span> px</div>
+      </div>
+      <div class="canvas" id="qrCanvas"></div>
+      <div class="dl-row">
+        <button class="btn" id="downloadPng">Download PNG</button>
+        <button class="btn secondary" id="downloadSvg">Download SVG</button>
       </div>
     </div>
   </div>
 
-  <!-- QRCode.js library -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <script>
-    let shortLinkCanvas = null;
-    let lastShortLink = "";
+    // Accordion behavior
+    document.addEventListener('click', function(e){
+      const head = e.target.closest('.ac-head');
+      if (!head) return;
+      const sel = head.getAttribute('data-target');
+      const body = document.querySelector(sel);
+      if (body) body.classList.toggle('open');
+    });
 
-    function generateQR() {
-      const accountNo = document.getElementById("accountNo").value;
-      const applicationNo = document.getElementById("applicationNo").value;
-      const businessName = document.getElementById("businessName").value;
-      const address = document.getElementById("address").value;
-      const startDate = document.getElementById("startDate").value;
-      const endDate = document.getElementById("endDate").value;
-      const status = document.getElementById("status").value;
+    // Initialize QR styling
+    let qr = null;
+    let currentSize = 600;
+    const canvasWrap = document.getElementById('qrCanvas');
 
-      // Full info block
-      const fullData = 
-        "License Account No. : " + accountNo + "\n\n" +
-        "Application No. : " + applicationNo + "\n\n" +
-        "Business Name : " + businessName + "\n\n" +
-        "Premises Address : " + address + "\n\n" +
-        "Start Date : " + startDate + "\n" +
-        "End Date : " + endDate + "\n" +
-        "Status : " + status;
-
-      // Short link (example domain)
-      const shortLink = "https://qr-depo.vercel.app/?id=" + accountNo;
-      lastShortLink = shortLink;
-
-      // Clear previous
-      document.getElementById("fullInfoQR").innerHTML = "";
-      document.getElementById("shortLinkQR").innerHTML = "";
-
-      // Generate Full Info QR
-      new QRCode(document.getElementById("fullInfoQR"), {
-        text: fullData,
-        width: 220,
-        height: 220,
-        colorDark: "#000000",
-        colorLight: "#ffffff",
-        correctLevel: QRCode.CorrectLevel.L
-      });
-
-      // Generate Short Link QR
-      const shortContainer = document.getElementById("shortLinkQR");
-      const shortInstance = new QRCode(shortContainer, {
-        text: shortLink,
-        width: 220,
-        height: 220,
-        colorDark: "#000000",
-        colorLight: "#ffffff",
-        correctLevel: QRCode.CorrectLevel.H
-      });
-
-      // Enable download once the canvas is available
-      // qrcodejs renders an <img> or <canvas>; force canvas for better PNG
-      setTimeout(function() {
-        const img = shortContainer.querySelector('img');
-        if (img) {
-          // Replace image with canvas to allow toDataURL
-          const tempQR = new QRCode(document.createElement('div'), {
-            text: shortLink,
-            width: 220,
-            height: 220,
-            colorDark: "#000000",
-            colorLight: "#ffffff",
-            correctLevel: QRCode.CorrectLevel.H
-          });
-          setTimeout(function() {
-            const cvs = tempQR._oDrawing._elCanvas;
-            if (cvs) {
-              shortContainer.innerHTML = "";
-              shortContainer.appendChild(cvs);
-              shortLinkCanvas = cvs;
-              document.getElementById('downloadShortBtn').disabled = false;
-            }
-          }, 0);
-        } else {
-          const cvs = shortContainer.querySelector('canvas');
-          if (cvs) {
-            shortLinkCanvas = cvs;
-            document.getElementById('downloadShortBtn').disabled = false;
-          }
-        }
-      }, 0);
+    function collectData() {
+      const accountNo = document.getElementById('accountNo').value.trim();
+      const applicationNo = document.getElementById('applicationNo').value.trim();
+      const businessName = document.getElementById('businessName').value.trim();
+      const address = document.getElementById('address').value.trim();
+      const startDate = document.getElementById('startDate').value.trim();
+      const endDate = document.getElementById('endDate').value.trim();
+      const status = document.getElementById('status').value.trim();
+      return `${accountNo}|${applicationNo}|${businessName}|${address}|${startDate}|${endDate}|${status}`;
     }
 
-    // Download handler for Short Link QR
-    document.addEventListener('DOMContentLoaded', function() {
-      document.getElementById('downloadShortBtn').addEventListener('click', function() {
-        // Generate a high-res (1024x1024) QR in a temporary container for sharp export
-        const temp = document.createElement('div');
-        temp.style.position = 'fixed';
-        temp.style.left = '-9999px';
-        document.body.appendChild(temp);
-        const tempQR = new QRCode(temp, {
-          text: lastShortLink || 'about:blank',
-          width: 1024,
-          height: 1024,
-          colorDark: '#000000',
-          colorLight: '#ffffff',
-          correctLevel: QRCode.CorrectLevel.H
-        });
-        setTimeout(function() {
-          const cvs = tempQR._oDrawing && tempQR._oDrawing._elCanvas;
-          const href = cvs ? cvs.toDataURL('image/png') : temp.querySelector('img')?.src;
-          if (href) {
-            const link = document.createElement('a');
-            link.download = 'short-link-qr-1024.png';
-            link.href = href;
-            link.click();
-          }
-          document.body.removeChild(temp);
-        }, 0);
-      });
+    function buildOptions() {
+      const fg = document.getElementById('fgHex').value || '#000000';
+      const bg = document.getElementById('bgHex').value || '#ffffff';
+      return {
+        width: currentSize,
+        height: currentSize,
+        type: 'svg',
+        data: collectData(),
+        qrOptions: { errorCorrectionLevel: 'H' },
+        image: canvasWrap.getAttribute('data-logo') || undefined,
+        imageOptions: { crossOrigin: 'anonymous', margin: 6, imageSize: 0.2 },
+        dotsOptions: { type: canvasWrap.getAttribute('data-dots') || 'square', color: fg },
+        backgroundOptions: { color: bg },
+        cornersSquareOptions: { type: canvasWrap.getAttribute('data-corners-square') || 'square', color: fg },
+        cornersDotOptions: { type: 'square', color: fg }
+      };
+    }
+
+    function renderQR() {
+      const options = buildOptions();
+      if (!qr) { qr = new QRCodeStyling(options); qr.append(canvasWrap); }
+      else { qr.update(options); }
+    }
+
+    // Generate button
+    document.getElementById('generateBtn').addEventListener('click', renderQR);
+
+    // Colors sync
+    const fgPicker = document.getElementById('fgPicker');
+    const bgPicker = document.getElementById('bgPicker');
+    fgPicker.addEventListener('input', function(){ document.getElementById('fgHex').value = this.value; renderQR(); });
+    bgPicker.addEventListener('input', function(){ document.getElementById('bgHex').value = this.value; renderQR(); });
+    document.getElementById('fgHex').addEventListener('input', function(){ fgPicker.value = this.value; renderQR(); });
+    document.getElementById('bgHex').addEventListener('input', function(){ bgPicker.value = this.value; renderQR(); });
+
+    // Shape selections
+    document.querySelectorAll('[data-dots]').forEach(function(btn){
+      btn.addEventListener('click', function(){ canvasWrap.setAttribute('data-dots', this.getAttribute('data-dots')); renderQR(); });
     });
+    document.querySelectorAll('[data-corners-square]').forEach(function(btn){
+      btn.addEventListener('click', function(){ canvasWrap.setAttribute('data-corners-square', this.getAttribute('data-corners-square')); renderQR(); });
+    });
+
+    // Size range
+    const sizeRange = document.getElementById('sizeRange');
+    const sizeLabel = document.getElementById('sizeLabel');
+    const sizeLabelY = document.getElementById('sizeLabelY');
+    sizeRange.addEventListener('input', function(){ currentSize = parseInt(this.value, 10); sizeLabel.textContent = currentSize; sizeLabelY.textContent = currentSize; renderQR(); });
+
+    // Logo upload
+    document.getElementById('logoFile').addEventListener('change', function(e){
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(ev){ canvasWrap.setAttribute('data-logo', ev.target.result); renderQR(); };
+      reader.readAsDataURL(file);
+    });
+
+    // Downloads
+    document.getElementById('downloadPng').addEventListener('click', function(){ if (!qr) renderQR(); qr.download({ name: 'qr-code', extension: 'png' }); });
+    document.getElementById('downloadSvg').addEventListener('click', function(){ if (!qr) renderQR(); qr.download({ name: 'qr-code', extension: 'svg' }); });
   </script>
 </body>
 </html>
