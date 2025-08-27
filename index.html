@@ -28,6 +28,7 @@
     #qrCanvas > svg, #qrCanvas > canvas { width: 100% !important; height: auto !important; }
     .tools { width: 100%; margin-top: 8px; display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: center; }
     .range { width: 100%; }
+    .finder-tools { width: 100%; display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: center; margin-top: 8px; }
     .dl-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; width: 100%; margin-top: 14px; }
     .hint { color: #6b7280; font-size: 12px; }
     .shape-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-top: 10px; }
@@ -44,6 +45,7 @@
     }
   </style>
   <script src="https://cdn.jsdelivr.net/npm/qr-code-styling@1.6.0/lib/qr-code-styling.js"></script>
+  <script src="https://unpkg.com/qrcode-generator@1.4.4/qrcode.js"></script>
 </head>
 <body>
   <div class="wrap">
@@ -145,7 +147,11 @@
         </div>
         <div class="hint"><span id="sizeLabel">600</span> x <span id="sizeLabelY">600</span> px</div>
       </div>
-      <div class="canvas"><div id="qrCanvas"></div></div>
+      <div class="canvas"><canvas id="qrCanvas" width="600" height="600"></canvas></div>
+      <div class="finder-tools">
+        <input class="range" id="finderScale" type="range" min="0.4" max="1.2" step="0.02" value="0.70">
+        <div class="hint">Finder size: <span id="finderScaleLabel">0.70</span>x</div>
+      </div>
       <div class="dl-row">
         <button class="btn" id="downloadPng">Download PNG</button>
         <button class="btn secondary" id="downloadSvg">Download SVG</button>
@@ -163,12 +169,13 @@
       if (body) body.classList.toggle('open');
     });
 
-    // Initialize QR styling
+    // Initialize QR styling (for styled exports) and custom canvas renderer
     let qr = null;
     let currentSize = 600;
     let currentData = ""; // stores either URL or content string
     let currentMode = 'form'; // 'form' | 'url'
-    const canvasWrap = document.getElementById('qrCanvas');
+    const canvasEl = document.getElementById('qrCanvas');
+    const canvasWrap = canvasEl; // keep old variable name usage minimal
 
     function collectData() {
       const accountNo = document.getElementById('accountNo').value.trim();
@@ -203,9 +210,66 @@
       };
     }
 
+    function drawCustomQR() {
+      // Use qrcode-generator to get modules, then draw on canvas and scale finders
+      const typeNumber = 0; // automatic
+      const errorCorrectLevel = 'H';
+      const data = currentMode === 'form' ? collectData() : currentData;
+      const qrGen = qrcode(typeNumber, errorCorrectLevel);
+      qrGen.addData(data);
+      qrGen.make();
+      const count = qrGen.getModuleCount();
+      const margin = 4; // quiet zone modules
+      const size = currentSize;
+      const cell = Math.floor(size / (count + margin * 2));
+      const drawSize = cell * (count + margin * 2);
+      canvasEl.width = drawSize;
+      canvasEl.height = drawSize;
+      const ctx = canvasEl.getContext('2d');
+      ctx.clearRect(0, 0, drawSize, drawSize);
+      // background transparent
+      const fg = document.getElementById('fgHex').value || '#000000';
+      const bg = document.getElementById('bgHex').value || '#ffffff';
+      // draw modules
+      ctx.fillStyle = fg;
+      for (let r = 0; r < count; r++) {
+        for (let c = 0; c < count; c++) {
+          if (qrGen.isDark(r, c)) {
+            ctx.fillRect((c + margin) * cell, (r + margin) * cell, cell, cell);
+          }
+        }
+      }
+      // overlay scaled finders
+      const scale = parseFloat(document.getElementById('finderScale').value);
+      drawFinder(ctx, margin, margin, cell, scale, fg, bg);
+      drawFinder(ctx, count - 7 + margin, margin, cell, scale, fg, bg);
+      drawFinder(ctx, margin, count - 7 + margin, cell, scale, fg, bg);
+    }
+
+    function drawFinder(ctx, startCol, startRow, cell, scale, fg, bg) {
+      const x = startCol * cell;
+      const y = startRow * cell;
+      const size = 7 * cell;
+      // clear area
+      ctx.clearRect(x, y, size, size);
+      // outer
+      ctx.fillStyle = fg;
+      ctx.fillRect(x, y, size, size);
+      // middle (white ring)
+      const m1 = cell * 1;
+      ctx.clearRect(x + m1, y + m1, size - 2 * m1, size - 2 * m1);
+      // inner black square scaled
+      const innerBase = 3 * cell;
+      const innerSize = Math.max(cell, Math.min(5 * cell, innerBase * scale + innerBase));
+      const innerOffset = (size - innerSize) / 2;
+      ctx.fillRect(x + innerOffset, y + innerOffset, innerSize, innerSize);
+    }
+
     function renderQR() {
+      drawCustomQR();
+      // keep styled instance updated for downloads (SVG/PNG transparent)
       const options = buildOptions();
-      if (!qr) { qr = new QRCodeStyling(options); qr.append(canvasWrap); }
+      if (!qr) { qr = new QRCodeStyling(options); qr.append(document.createElement('div')); }
       else { qr.update(options); }
     }
 
@@ -261,6 +325,10 @@
     const sizeLabel = document.getElementById('sizeLabel');
     const sizeLabelY = document.getElementById('sizeLabelY');
     sizeRange.addEventListener('input', function(){ currentSize = parseInt(this.value, 10); sizeLabel.textContent = currentSize; sizeLabelY.textContent = currentSize; renderQR(); });
+    // Finder scale control
+    const finderRange = document.getElementById('finderScale');
+    const finderLabel = document.getElementById('finderScaleLabel');
+    finderRange.addEventListener('input', function(){ finderLabel.textContent = parseFloat(this.value).toFixed(2); drawCustomQR(); });
 
     // Logo upload
     document.getElementById('logoFile').addEventListener('change', function(e){
