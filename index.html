@@ -111,6 +111,11 @@
             <button data-corners-square="dot">Dot</button>
             <button data-corners-square="extra-rounded">Extra Rounded</button>
           </div>
+          <label style="margin-top:12px;">Presets</label>
+          <div class="shape-grid">
+            <button data-preset="classic">Classic QR</button>
+            <button data-preset="rounded-eyes">Rounded Eyes</button>
+          </div>
         </div>
       </div>
     </div>
@@ -159,12 +164,14 @@
     function buildOptions() {
       const fg = document.getElementById('fgHex').value || '#000000';
       const bg = document.getElementById('bgHex').value || '#ffffff';
+      const margin = parseInt(canvasWrap.getAttribute('data-margin') || '10', 10);
       return {
         width: currentSize,
         height: currentSize,
         type: 'svg',
         data: collectData(),
         qrOptions: { errorCorrectionLevel: 'H' },
+        margin: margin,
         image: canvasWrap.getAttribute('data-logo') || undefined,
         imageOptions: { crossOrigin: 'anonymous', margin: 6, imageSize: 0.2 },
         dotsOptions: { type: canvasWrap.getAttribute('data-dots') || 'square', color: fg },
@@ -197,6 +204,23 @@
     });
     document.querySelectorAll('[data-corners-square]').forEach(function(btn){
       btn.addEventListener('click', function(){ canvasWrap.setAttribute('data-corners-square', this.getAttribute('data-corners-square')); renderQR(); });
+    });
+
+    // Presets
+    document.querySelectorAll('[data-preset]').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        const preset = this.getAttribute('data-preset');
+        if (preset === 'classic') {
+          canvasWrap.setAttribute('data-dots', 'square');
+          canvasWrap.setAttribute('data-corners-square', 'square');
+          canvasWrap.setAttribute('data-margin', '12');
+        } else if (preset === 'rounded-eyes') {
+          canvasWrap.setAttribute('data-dots', 'square');
+          canvasWrap.setAttribute('data-corners-square', 'extra-rounded');
+          canvasWrap.setAttribute('data-margin', '12');
+        }
+        renderQR();
+      });
     });
 
     // Size range
