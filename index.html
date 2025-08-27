@@ -274,9 +274,12 @@
     // Downloads
     document.getElementById('downloadPng').addEventListener('click', function(){
       if (!qr) { currentMode = 'form'; currentData = collectData(); renderQR(); }
-      // Create a temporary transparent QR for export
-      const transparentOpts = Object.assign({}, buildOptions());
-      transparentOpts.backgroundOptions = { color: 'transparent' };
+      // Create a temporary transparent QR for export (force canvas renderer)
+      const base = buildOptions();
+      const transparentOpts = Object.assign({}, base, {
+        type: 'canvas',
+        backgroundOptions: { color: 'transparent' }
+      });
       const tmp = new QRCodeStyling(transparentOpts);
       tmp.download({ name: 'qr-code', extension: 'png' });
     });
