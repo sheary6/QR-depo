@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <title>MBPJ License QR Code Generator</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/qr-code-styling@1.6.0/lib/qr-code-styling.js"></script>
   <style>
     body {
       font-family: 'Segoe UI', Arial, sans-serif;
@@ -72,12 +73,13 @@
       margin: 30px 0;
     }
     .qr-code {
-      width: 200px;
-      height: 200px;
+      width: 240px;
+      height: 240px;
       background: white;
-      border: 1px solid #000;
-      padding: 5px;
       box-sizing: border-box;
+      border-radius: 8px;
+      padding: 8px; /* creates a clean white quiet zone */
+      border: 0; /* styled QR renders its own crisp edges */
     }
     .footer {
       text-align: center;
@@ -138,6 +140,9 @@
     <div class="qr-container">
       <div id="qrcode" class="qr-code"></div>
     </div>
+    <div style="text-align:center;">
+      <button type="button" id="downloadBtn">Download QR (PNG)</button>
+    </div>
 
     <div class="footer">
       Generated for official use • MBPJ Compliance • Scan to verify license details
@@ -155,6 +160,9 @@
       document.getElementById('endDate').value = '31 December, 2025';
       document.getElementById('status').value = 'APPROVED';
     };
+
+    // Reusable styled QR instance (uses SVG internally for sharp rendering)
+    let styledQR = null;
 
     function generateQR() {
       const accountNo = document.getElementById('accountNo').value.trim();
@@ -178,19 +186,53 @@
       qrContainer.innerHTML = "";
 
       try {
-        new QRCode(qrContainer, {
-          text: data,
-          width: 200,
-          height: 200,
-          colorDark: "#000000",
-          colorLight: "#ffffff",
-          correctLevel: QRCode.CorrectLevel.H
-        });
+        const options = {
+          width: 224,
+          height: 224,
+          type: "svg",
+          data: data,
+          margin: 0,
+          qrOptions: {
+            errorCorrectionLevel: "H"
+          },
+          dotsOptions: {
+            type: "square", // use "dots" for rounded look
+            color: "#000000"
+          },
+          backgroundOptions: {
+            color: "#ffffff"
+          },
+          cornersSquareOptions: {
+            type: "extra-rounded",
+            color: "#000000"
+          },
+          cornersDotOptions: {
+            type: "square",
+            color: "#000000"
+          }
+        };
+
+        if (!styledQR) {
+          styledQR = new QRCodeStyling(options);
+        } else {
+          styledQR.update(options);
+        }
+        styledQR.append(qrContainer);
       } catch (error) {
         console.error("QR Code generation failed:", error);
         qrContainer.innerHTML = "<p style='color:red;'>Failed to generate QR code. Check internet connection.</p>";
       }
     }
+
+    // Download button wiring
+    document.addEventListener('DOMContentLoaded', function () {
+      document.getElementById('downloadBtn').addEventListener('click', function () {
+        if (!styledQR) {
+          generateQR();
+        }
+        styledQR.download({ name: 'license-qr', extension: 'png' });
+      });
+    });
   </script>
 
 </body>
