@@ -77,9 +77,9 @@
       height: 240px;
       background: white;
       box-sizing: border-box;
-      border-radius: 8px;
-      padding: 8px; /* creates a clean white quiet zone */
-      border: 0; /* styled QR renders its own crisp edges */
+      border-radius: 0;
+      padding: 0;
+      border: 0;
     }
     .footer {
       text-align: center;
@@ -187,23 +187,23 @@
 
       try {
         const options = {
-          width: 224,
-          height: 224,
-          type: "svg",
+          width: 240,
+          height: 240,
+          type: "canvas",
           data: data,
-          margin: 0,
+          margin: 12, // quiet zone similar to reference
           qrOptions: {
             errorCorrectionLevel: "H"
           },
           dotsOptions: {
-            type: "square", // use "dots" for rounded look
+            type: "square",
             color: "#000000"
           },
           backgroundOptions: {
             color: "#ffffff"
           },
           cornersSquareOptions: {
-            type: "extra-rounded",
+            type: "square",
             color: "#000000"
           },
           cornersDotOptions: {
