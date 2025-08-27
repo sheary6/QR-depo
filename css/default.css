@@ -1,0 +1,35 @@
+#msg-notification{
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 5000;
+    opacity: 0.9;
+}
+
+.checkbox-font_awesome input[type=checkbox] { display:none; } /* to hide the checkbox itself */
+.checkbox-font_awesome input[type=checkbox] + label:before {font-family: FontAwesome;display: inline-block;}
+.checkbox-font_awesome input[type=checkbox] + label:before { content: "\f096"; } /* unchecked icon */
+.checkbox-font_awesome input[type=checkbox] + label:before { letter-spacing: 10px; } /* space between checkbox and label */
+.checkbox-font_awesome input[type=checkbox]:checked + label:before { content: "\f046";} /* checked icon */
+.checkbox-font_awesome input[type=checkbox]:checked + label:before { letter-spacing: 5px; } /* allow space for check mark */
+
+.checkbox-font_awesome-2x input[type=checkbox] { display:none; } /* to hide the checkbox itself */
+.checkbox-font_awesome-2x input[type=checkbox] + label:before {font-family: FontAwesome;display: inline-block;font-size: 2em;}
+.checkbox-font_awesome-2x input[type=checkbox] + label:before { content: "\f096";font-size: 2em; } /* unchecked icon */
+.checkbox-font_awesome-2x input[type=checkbox] + label:before { letter-spacing: 10px; } /* space between checkbox and label */
+.checkbox-font_awesome-2x input[type=checkbox]:checked + label:before { content: "\f046"; font-size: 2em;} /* checked icon */
+.checkbox-font_awesome-2x input[type=checkbox]:checked + label:before { letter-spacing: 5px; } /* allow space for check mark */
+
+.checkbox-font_awesome-3x input[type=checkbox] { display:none; } /* to hide the checkbox itself */
+.checkbox-font_awesome-3x input[type=checkbox] + label:before {font-family: FontAwesome;display: inline-block;font-size: 3em;}
+.checkbox-font_awesome-3x input[type=checkbox] + label:before { content: "\f096";font-size: 3em; } /* unchecked icon */
+.checkbox-font_awesome-3x input[type=checkbox] + label:before { letter-spacing: 10px; } /* space between checkbox and label */
+.checkbox-font_awesome-3x input[type=checkbox]:checked + label:before { content: "\f046"; font-size: 3em;} /* checked icon */
+.checkbox-font_awesome-3x input[type=checkbox]:checked + label:before { letter-spacing: 5px; } /* allow space for check mark */
+
+.checkbox-font_awesome-4x input[type=checkbox] { display:none; } /* to hide the checkbox itself */
+.checkbox-font_awesome-4x input[type=checkbox] + label:before {font-family: FontAwesome;display: inline-block;font-size: 4em;}
+.checkbox-font_awesome-4x input[type=checkbox] + label:before { content: "\f096";font-size: 4em; } /* unchecked icon */
+.checkbox-font_awesome-4x input[type=checkbox] + label:before { letter-spacing: 10px; } /* space between checkbox and label */
+.checkbox-font_awesome-4x input[type=checkbox]:checked + label:before { content: "\f046"; font-size: 4em;} /* checked icon */
+.checkbox-font_awesome-4x input[type=checkbox]:checked + label:before { letter-spacing: 5px; } /* allow space for check mark */
