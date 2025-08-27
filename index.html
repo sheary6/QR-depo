@@ -134,7 +134,7 @@
             <button data-preset="classic">Classic QR</button>
             <button data-preset="rounded-eyes">Rounded Eyes</button>
           </div>
-        </div>
+      </div>
       </div>
     </div>
 
@@ -149,7 +149,7 @@
       <div class="dl-row">
         <button class="btn" id="downloadPng">Download PNG</button>
         <button class="btn secondary" id="downloadSvg">Download SVG</button>
-      </div>
+    </div>
     </div>
   </div>
 
@@ -272,7 +272,14 @@
     });
 
     // Downloads
-    document.getElementById('downloadPng').addEventListener('click', function(){ if (!qr) { currentMode = 'form'; currentData = collectData(); renderQR(); } qr.download({ name: 'qr-code', extension: 'png' }); });
+    document.getElementById('downloadPng').addEventListener('click', function(){
+      if (!qr) { currentMode = 'form'; currentData = collectData(); renderQR(); }
+      // Create a temporary transparent QR for export
+      const transparentOpts = Object.assign({}, buildOptions());
+      transparentOpts.backgroundOptions = { color: 'transparent' };
+      const tmp = new QRCodeStyling(transparentOpts);
+      tmp.download({ name: 'qr-code', extension: 'png' });
+    });
     document.getElementById('downloadSvg').addEventListener('click', function(){ if (!qr) { currentMode = 'form'; currentData = collectData(); renderQR(); } qr.download({ name: 'qr-code', extension: 'svg' }); });
 
     // Tabs: show one section at a time
