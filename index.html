@@ -103,6 +103,7 @@ DAMANSARA UPTOWN,
       <div class="qr-block">
         <h3>🔗 Short Link QR (Clean)</h3>
         <div id="shortLinkQR"></div>
+        <button type="button" id="downloadShortBtn" disabled>Download Short Link QR (PNG)</button>
       </div>
     </div>
   </div>
@@ -110,6 +111,9 @@ DAMANSARA UPTOWN,
   <!-- QRCode.js library -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <script>
+    let shortLinkCanvas = null;
+    let lastShortLink = "";
+
     function generateQR() {
       const accountNo = document.getElementById("accountNo").value;
       const applicationNo = document.getElementById("applicationNo").value;
@@ -130,7 +134,8 @@ DAMANSARA UPTOWN,
         "Status : " + status;
 
       // Short link (example domain)
-      const shortLink = "https://example.com/license?id=" + accountNo;
+      const shortLink = "https://qr-depo.vercel.app/?id=" + accountNo;
+      lastShortLink = shortLink;
 
       // Clear previous
       document.getElementById("fullInfoQR").innerHTML = "";
@@ -147,7 +152,8 @@ DAMANSARA UPTOWN,
       });
 
       // Generate Short Link QR
-      new QRCode(document.getElementById("shortLinkQR"), {
+      const shortContainer = document.getElementById("shortLinkQR");
+      const shortInstance = new QRCode(shortContainer, {
         text: shortLink,
         width: 220,
         height: 220,
@@ -155,7 +161,69 @@ DAMANSARA UPTOWN,
         colorLight: "#ffffff",
         correctLevel: QRCode.CorrectLevel.H
       });
+
+      // Enable download once the canvas is available
+      // qrcodejs renders an <img> or <canvas>; force canvas for better PNG
+      setTimeout(function() {
+        const img = shortContainer.querySelector('img');
+        if (img) {
+          // Replace image with canvas to allow toDataURL
+          const tempQR = new QRCode(document.createElement('div'), {
+            text: shortLink,
+            width: 220,
+            height: 220,
+            colorDark: "#000000",
+            colorLight: "#ffffff",
+            correctLevel: QRCode.CorrectLevel.H
+          });
+          setTimeout(function() {
+            const cvs = tempQR._oDrawing._elCanvas;
+            if (cvs) {
+              shortContainer.innerHTML = "";
+              shortContainer.appendChild(cvs);
+              shortLinkCanvas = cvs;
+              document.getElementById('downloadShortBtn').disabled = false;
+            }
+          }, 0);
+        } else {
+          const cvs = shortContainer.querySelector('canvas');
+          if (cvs) {
+            shortLinkCanvas = cvs;
+            document.getElementById('downloadShortBtn').disabled = false;
+          }
+        }
+      }, 0);
     }
+
+    // Download handler for Short Link QR
+    document.addEventListener('DOMContentLoaded', function() {
+      document.getElementById('downloadShortBtn').addEventListener('click', function() {
+        // Generate a high-res (1024x1024) QR in a temporary container for sharp export
+        const temp = document.createElement('div');
+        temp.style.position = 'fixed';
+        temp.style.left = '-9999px';
+        document.body.appendChild(temp);
+        const tempQR = new QRCode(temp, {
+          text: lastShortLink || 'about:blank',
+          width: 1024,
+          height: 1024,
+          colorDark: '#000000',
+          colorLight: '#ffffff',
+          correctLevel: QRCode.CorrectLevel.H
+        });
+        setTimeout(function() {
+          const cvs = tempQR._oDrawing && tempQR._oDrawing._elCanvas;
+          const href = cvs ? cvs.toDataURL('image/png') : temp.querySelector('img')?.src;
+          if (href) {
+            const link = document.createElement('a');
+            link.download = 'short-link-qr-1024.png';
+            link.href = href;
+            link.click();
+          }
+          document.body.removeChild(temp);
+        }, 0);
+      });
+    });
   </script>
 </body>
 </html>
