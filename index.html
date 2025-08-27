@@ -171,6 +171,8 @@
     // Initialize QR styling
     let qr = null;
     let currentSize = 600;
+    let currentData = ""; // stores either URL or content string
+    let currentMode = 'form'; // 'form' | 'url'
     const canvasWrap = document.getElementById('qrCanvas');
 
     function collectData() {
@@ -192,7 +194,7 @@
         width: currentSize,
         height: currentSize,
         type: 'svg',
-        data: collectData(),
+        data: currentData,
         qrOptions: { errorCorrectionLevel: 'H' },
         margin: margin,
         image: canvasWrap.getAttribute('data-logo') || undefined,
@@ -211,12 +213,17 @@
     }
 
     // Generate buttons
-    document.getElementById('generateBtn').addEventListener('click', renderQR);
+    document.getElementById('generateBtn').addEventListener('click', function(){
+      currentMode = 'form';
+      currentData = collectData();
+      renderQR();
+    });
     document.getElementById('generateUrlBtn').addEventListener('click', function(){
       const url = document.getElementById('inputUrl').value.trim();
       if (!url) return;
-      if (!qr) { qr = new QRCodeStyling(buildOptions()); qr.append(canvasWrap); }
-      qr.update({ data: url });
+      currentMode = 'url';
+      currentData = url;
+      renderQR();
     });
 
     // Colors sync
@@ -268,8 +275,8 @@
     });
 
     // Downloads
-    document.getElementById('downloadPng').addEventListener('click', function(){ if (!qr) renderQR(); qr.download({ name: 'qr-code', extension: 'png' }); });
-    document.getElementById('downloadSvg').addEventListener('click', function(){ if (!qr) renderQR(); qr.download({ name: 'qr-code', extension: 'svg' }); });
+    document.getElementById('downloadPng').addEventListener('click', function(){ if (!qr) { currentData = collectData(); renderQR(); } qr.download({ name: 'qr-code', extension: 'png' }); });
+    document.getElementById('downloadSvg').addEventListener('click', function(){ if (!qr) { currentData = collectData(); renderQR(); } qr.download({ name: 'qr-code', extension: 'svg' }); });
 
     // Header switches
     document.getElementById('switchToUrl').addEventListener('click', function(){
