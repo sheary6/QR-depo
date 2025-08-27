@@ -1,239 +1,161 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>MBPJ License QR Code Generator</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/qr-code-styling@1.6.0/lib/qr-code-styling.js"></script>
+  <meta charset="UTF-8">
+  <title>License QR Generator</title>
   <style>
     body {
-      font-family: 'Segoe UI', Arial, sans-serif;
-      background-color: #f9f9f9;
-      color: #333;
-      margin: 0;
-      padding: 20px;
-    }
-    .container {
-      max-width: 700px;
-      margin: 0 auto;
-      background: white;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      padding: 20px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    }
-    h1 {
-      text-align: center;
-      color: #0055a5;
-      margin-bottom: 20px;
-    }
-    .form-group {
-      margin-bottom: 15px;
-    }
-    label {
-      display: block;
-      font-weight: bold;
-      margin-bottom: 5px;
-      color: #0055a5;
-    }
-    input[type="text"], textarea {
-      width: 100%;
-      padding: 10px;
-      border: 1px solid #ddd;
-      border-radius: 4px;
-      font-size: 14px;
-    }
-    textarea {
-      height: 80px;
-      resize: vertical;
-    }
-    button {
-      background-color: #0055a5;
-      color: white;
-      padding: 10px 20px;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 16px;
-      margin-top: 10px;
-    }
-    button:hover {
-      background-color: #003d7a;
-    }
-    .preview {
-      margin-top: 20px;
-      padding: 15px;
-      background-color: #f8f9fa;
-      border: 1px dashed #ccc;
-      border-radius: 4px;
-    }
-    .qr-container {
+      font-family: Arial, sans-serif;
+      background: #f6f7f9;
       display: flex;
       justify-content: center;
-      margin: 30px 0;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
     }
-    .qr-code {
-      width: 240px;
-      height: 240px;
-      background: white;
-      box-sizing: border-box;
-      border-radius: 0;
-      padding: 0;
-      border: 0;
+    .container {
+      background: #fff;
+      padding: 20px 30px;
+      border-radius: 12px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+      width: 520px;
+      max-width: 95vw;
     }
-    .footer {
+    h2 {
+      margin-top: 0;
+      font-size: 20px;
       text-align: center;
-      font-size: 10px;
-      color: #777;
-      margin-top: 20px;
+    }
+    label {
+      font-weight: bold;
+      display: block;
+      margin-top: 12px;
+    }
+    input, textarea {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+    textarea { resize: vertical; min-height: 60px; }
+    button {
+      margin-top: 16px;
+      width: 100%;
+      padding: 10px;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      background: #111827;
+      color: #fff;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    button:hover { background: #374151; }
+    .qr-output { margin-top: 20px; }
+    .qr-block { margin-top: 18px; text-align: center; }
+    .qr-block h3 { margin-bottom: 8px; }
+    .qr-block img {
+      margin-top: 6px;
+      width: 220px;
+      height: 220px;
+      image-rendering: pixelated;
     }
   </style>
 </head>
 <body>
-
   <div class="container">
-    <h1>MBPJ LICENSE QR CODE GENERATOR</h1>
+    <h2>License QR Code Generator</h2>
+    <form id="qrForm">
+      <label>License Account No.:</label>
+      <input type="text" id="accountNo" value="L2540000675570">
 
-    <form id="licenseForm">
-      <div class="form-group">
-        <label for="accountNo">License Account No.</label>
-        <input type="text" id="accountNo" placeholder="e.g., L2540000675570" required>
-      </div>
+      <label>Application No.:</label>
+      <input type="text" id="applicationNo" value="EL2540000687612">
 
-      <div class="form-group">
-        <label for="appNo">Application No.</label>
-        <input type="text" id="appNo" placeholder="e.g., EL2540000687612" required>
-      </div>
+      <label>Business Name:</label>
+      <input type="text" id="businessName" value="KOPI KENANGAN SDN BHD">
 
-      <div class="form-group">
-        <label for="businessName">Business Name</label>
-        <input type="text" id="businessName" placeholder="e.g., KOPI KENANGAN SDN BHD" required>
-      </div>
+      <label>Premises Address:</label>
+      <textarea id="address">UNIT 1302, LEVEL 13, UPTOWN 2,
+NO. 2 JALAN SS21/37,
+DAMANSARA UPTOWN,
+47400 PETALING JAYA</textarea>
 
-      <div class="form-group">
-        <label for="address">Premises Address</label>
-        <textarea id="address" placeholder="e.g., UNIT 1302, LEVEL 13, UPTOWN 2, NO. 2 JALAN SS21/37, DAMANSARA UPTOWN, 47400 PETALING JAYA" required></textarea>
-      </div>
+      <label>Start Date:</label>
+      <input type="text" id="startDate" value="01 January, 2025">
 
-      <div class="form-group">
-        <label for="startDate">Start Date</label>
-        <input type="text" id="startDate" placeholder="e.g., 01 January, 2025" required>
-      </div>
+      <label>End Date:</label>
+      <input type="text" id="endDate" value="31 December, 2025">
 
-      <div class="form-group">
-        <label for="endDate">End Date</label>
-        <input type="text" id="endDate" placeholder="e.g., 31 December, 2025" required>
-      </div>
+      <label>Status:</label>
+      <input type="text" id="status" value="APPROVED">
 
-      <div class="form-group">
-        <label for="status">Status</label>
-        <input type="text" id="status" placeholder="e.g., APPROVED" required>
-      </div>
-
-      <button type="button" onclick="generateQR()">Generate QR Code</button>
+      <button type="button" onclick="generateQR()">Generate QR Codes</button>
     </form>
 
-    <div class="preview" id="preview">
-      <p><strong>Preview:</strong> Your QR code will appear here after clicking "Generate QR Code".</p>
-    </div>
-
-    <div class="qr-container">
-      <div id="qrcode" class="qr-code"></div>
-    </div>
-    <div style="text-align:center;">
-      <button type="button" id="downloadBtn">Download QR (PNG)</button>
-    </div>
-
-    <div class="footer">
-      Generated for official use • MBPJ Compliance • Scan to verify license details
+    <div class="qr-output">
+      <div class="qr-block">
+        <h3>📄 Full Info QR (Dense)</h3>
+        <div id="fullInfoQR"></div>
+      </div>
+      <div class="qr-block">
+        <h3>🔗 Short Link QR (Clean)</h3>
+        <div id="shortLinkQR"></div>
+      </div>
     </div>
   </div>
 
+  <!-- QRCode.js library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <script>
-    window.onload = function () {
-      // Pre-fill sample data
-      document.getElementById('accountNo').value = 'L2540000675570';
-      document.getElementById('appNo').value = 'EL2540000687612';
-      document.getElementById('businessName').value = 'KOPI KENANGAN SDN BHD';
-      document.getElementById('address').value = 'UNIT 1302, LEVEL 13, UPTOWN 2, NO. 2 JALAN SS21/37, DAMANSARA UPTOWN, 47400 PETALING JAYA';
-      document.getElementById('startDate').value = '01 January, 2025';
-      document.getElementById('endDate').value = '31 December, 2025';
-      document.getElementById('status').value = 'APPROVED';
-    };
-
-    // Reusable styled QR instance (uses SVG internally for sharp rendering)
-    let styledQR = null;
-
     function generateQR() {
-      const accountNo = document.getElementById('accountNo').value.trim();
-      const appNo = document.getElementById('appNo').value.trim();
-      const businessName = document.getElementById('businessName').value.trim();
-      const address = document.getElementById('address').value.trim();
-      const startDate = document.getElementById('startDate').value.trim();
-      const endDate = document.getElementById('endDate').value.trim();
-      const status = document.getElementById('status').value.trim();
+      const accountNo = document.getElementById("accountNo").value;
+      const applicationNo = document.getElementById("applicationNo").value;
+      const businessName = document.getElementById("businessName").value;
+      const address = document.getElementById("address").value;
+      const startDate = document.getElementById("startDate").value;
+      const endDate = document.getElementById("endDate").value;
+      const status = document.getElementById("status").value;
 
-      if (!accountNo || !appNo || !businessName || !address || !startDate || !endDate || !status) {
-        alert("Please fill in all fields.");
-        return;
-      }
+      // Full info block
+      const fullData = 
+        "License Account No. : " + accountNo + "\n\n" +
+        "Application No. : " + applicationNo + "\n\n" +
+        "Business Name : " + businessName + "\n\n" +
+        "Premises Address : " + address + "\n\n" +
+        "Start Date : " + startDate + "\n" +
+        "End Date : " + endDate + "\n" +
+        "Status : " + status;
 
-      const data = `${accountNo}|${appNo}|${businessName}|${address}|${startDate}|${endDate}|${status}`;
+      // Short link (example domain)
+      const shortLink = "https://example.com/license?id=" + accountNo;
 
-      document.getElementById('preview').innerHTML = `<p><strong>QR Code Data:</strong> ${data}</p>`;
+      // Clear previous
+      document.getElementById("fullInfoQR").innerHTML = "";
+      document.getElementById("shortLinkQR").innerHTML = "";
 
-      const qrContainer = document.getElementById("qrcode");
-      qrContainer.innerHTML = "";
-
-      try {
-        const options = {
-          width: 240,
-          height: 240,
-          type: "canvas",
-          data: data,
-          margin: 12, // quiet zone similar to reference
-          qrOptions: {
-            errorCorrectionLevel: "H"
-          },
-          dotsOptions: {
-            type: "square",
-            color: "#000000"
-          },
-          backgroundOptions: {
-            color: "#ffffff"
-          },
-          cornersSquareOptions: {
-            type: "square",
-            color: "#000000"
-          },
-          cornersDotOptions: {
-            type: "square",
-            color: "#000000"
-          }
-        };
-
-        if (!styledQR) {
-          styledQR = new QRCodeStyling(options);
-        } else {
-          styledQR.update(options);
-        }
-        styledQR.append(qrContainer);
-      } catch (error) {
-        console.error("QR Code generation failed:", error);
-        qrContainer.innerHTML = "<p style='color:red;'>Failed to generate QR code. Check internet connection.</p>";
-      }
-    }
-
-    // Download button wiring
-    document.addEventListener('DOMContentLoaded', function () {
-      document.getElementById('downloadBtn').addEventListener('click', function () {
-        if (!styledQR) {
-          generateQR();
-        }
-        styledQR.download({ name: 'license-qr', extension: 'png' });
+      // Generate Full Info QR
+      new QRCode(document.getElementById("fullInfoQR"), {
+        text: fullData,
+        width: 220,
+        height: 220,
+        colorDark: "#000000",
+        colorLight: "#ffffff",
+        correctLevel: QRCode.CorrectLevel.L
       });
-    });
-  </script>
 
+      // Generate Short Link QR
+      new QRCode(document.getElementById("shortLinkQR"), {
+        text: shortLink,
+        width: 220,
+        height: 220,
+        colorDark: "#000000",
+        colorLight: "#ffffff",
+        correctLevel: QRCode.CorrectLevel.H
+      });
+    }
+  </script>
 </body>
 </html>
